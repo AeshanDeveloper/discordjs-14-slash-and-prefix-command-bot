@@ -3,6 +3,7 @@ class Dependencies {
     config = require("./../config.js")
     fs = require("fs")
     path = require("path")
+    ms = require("ms")
     // "index" = require("./../index")
     
 }

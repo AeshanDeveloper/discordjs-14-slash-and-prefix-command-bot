@@ -1,87 +1,98 @@
-global.deps.discordjs = require("discord.js");
+exports.name = "mute"; // Ensure this exists
+exports.aliases = ["silence", "timeout"];
+exports.description = "Mute a user in the server.";
+exports.usage = "<user> <duration>";
+exports.category = "moderation";
 
 exports.run = async (client, message, args) => {
-    if (!message.member.permissions.has(global.deps.discordjs.PermissionsBitField.Flags.ModerateMembers)) {
-        return message.reply(`${global.deps.config.settings.emojis.error} You do not have permission to mute members.`);
+    if (!message.member.permissions.has(global.deps.discordjs.PermissionsBitField.Flags.MuteMembers)) {
+        return message.reply(`${global.deps.config.settings.emojis.error} You don't have permission to mute members!`);
     }
 
-    const user = message.mentions.members.first() || await message.guild.members.fetch(args[0]).catch(() => null);
-    if (!user) {
-        return message.reply(`${global.deps.config.settings.emojis.error} Please mention a valid user or provide a valid user ID.`);
+    const target = message.mentions.users.first() || client.users.cache.get(args[0]);
+    const durationString = args[1]?.toLowerCase();
+
+    if (!target || !durationString) {
+        return message.reply(`${global.deps.config.settings.emojis.error} Usage: \`${message.prefix}mute <user> <duration>\`\nExample: \`${message.prefix}mute @user 10m\``);
     }
 
-    if (user.communicationDisabledUntil) {
-        return message.reply(`${global.deps.config.settings.emojis.error} This user is already muted.`);
+    const member = await message.guild.members.fetch(target.id).catch(() => null);
+    if (!member) {
+        return message.reply(`${global.deps.config.settings.emojis.error} User is not in the server!`);
     }
 
-    const duration = args[1];
-    if (!duration || isNaN(ms(duration))) {
-        return message.reply(`${global.deps.config.settings.emojis.error} Please provide a valid duration (e.g., 10m, 1h, 2d).`);
+    // Function to convert time string (e.g., "10m", "2h") to milliseconds
+    function parseDuration(input) {
+        const match = input.match(/^(\d+)(s|m|h|d)$/);
+        if (!match) return null;
+
+        const value = parseInt(match[1]);
+        const unit = match[2];
+
+        switch (unit) {
+            case "s": return value * 1000;         // Seconds
+            case "m": return value * 60 * 1000;    // Minutes
+            case "h": return value * 60 * 60 * 1000; // Hours
+            case "d": return value * 24 * 60 * 60 * 1000; // Days
+            default: return null;
+        }
     }
 
-    const reason = args.slice(2).join(" ") || "No reason provided";
+    const durationMs = parseDuration(durationString);
+    if (!durationMs) {
+        return message.reply(`${global.deps.config.settings.emojis.error} Invalid duration format! Use **Xs, Xm, Xh, or Xd** (e.g., 10m, 2h, 1d).`);
+    }
 
-    const row = new global.deps.discordjs.ActionRowBuilder()
-        .addComponents(
-            new global.deps.discordjs.ButtonBuilder()
-                .setCustomId("confirm_mute")
-                .setLabel("Confirm")
-                .setStyle(global.deps.discordjs.ButtonStyle.Success)
-                .setEmoji(global.deps.config.settings.emojis.success),
-            new global.deps.discordjs.ButtonBuilder()
-                .setCustomId("cancel_mute")
-                .setLabel("Cancel")
-                .setStyle(global.deps.discordjs.ButtonStyle.Danger)
-                .setEmoji(global.deps.config.settings.emojis.error)
-        );
+    const row = new global.deps.discordjs.ActionRowBuilder().addComponents(
+        new global.deps.discordjs.ButtonBuilder()
+            .setCustomId("confirm_mute")
+            .setLabel("Confirm")
+            .setStyle(global.deps.discordjs.ButtonStyle.Success),
+        new global.deps.discordjs.ButtonBuilder()
+            .setCustomId("cancel_mute")
+            .setLabel("Cancel")
+            .setStyle(global.deps.discordjs.ButtonStyle.Danger)
+    );
 
     const embed = new global.deps.discordjs.EmbedBuilder()
-        .setColor(global.deps.config.settings.colors.embeds.mute)
-        .setTitle(`${global.deps.config.settings.emojis.mute} Mute Confirmation`)
-        .setDescription(`Are you sure you want to mute **${user.user.tag}**?\n\n**Duration:** ${duration}\n**Reason:** ${reason}`);
+        .setColor(global.deps.config.settings.colors.embeds.default)
+        .setDescription(`Are you sure you want to mute **${target.tag}** for **${durationString}**?`);
 
-    const msg = await message.channel.send({ embeds: [embed], components: [row] });
+    const msg = await message.reply({ embeds: [embed], components: [row] });
 
-    const filter = i => i.user.id === message.author.id;
-    const collector = msg.createMessageComponentCollector({ filter, time: 15000 });
+    const collector = msg.createMessageComponentCollector({
+        filter: (i) => i.user.id === message.author.id,
+        time: 15000
+    });
 
-    collector.on("collect", async interaction => {
+    collector.on("collect", async (interaction) => {
         if (interaction.customId === "confirm_mute") {
-            await user.timeout(ms(duration), reason).catch(() => {
-                return interaction.reply({ content: `${global.deps.config.settings.emojis.error} Failed to mute ${user.user.tag}.`, flags: 64 });
-            });
+            try {
+                await member.timeout(durationMs);
 
-            const successEmbed = new global.deps.discordjs.EmbedBuilder()
-                .setColor(global.deps.config.settings.colors.embeds.mute)
-                .setTitle(`${global.deps.config.settings.emojis.success} Mute Successful`)
-                .setDescription(`**${user.user.tag}** has been muted.\n\n**Duration:** ${duration}\n**Reason:** ${reason}`);
+                const confirmEmbed = new global.deps.discordjs.EmbedBuilder()
+                    .setColor(global.deps.config.settings.colors.embeds.default)
+                    .setDescription(`${global.deps.config.settings.emojis.success} Muted **${target.tag}** for **${durationString}**.`);
 
-            await interaction.update({ embeds: [successEmbed], components: [] });
+                await interaction.update({ embeds: [confirmEmbed], components: [] });
 
-            // Notify the muted user
-            user.send({
-                embeds: [
-                    new global.deps.discordjs.EmbedBuilder()
-                        .setColor(global.deps.config.settings.colors.embeds.mute)
-                        .setTitle(`${global.deps.config.settings.emojis.notification} You have been muted`)
-                        .setDescription(`You have been muted in **${message.guild.name}**.\n\n**Duration:** ${duration}\n**Reason:** ${reason}`)
-                ]
-            }).catch(() => null);
+                // Send DM only if mute was successful
+                await target.send(`${global.deps.config.settings.emojis.mute} You have been **muted** in **${message.guild.name}** for **${durationString}**!`).catch(() => null);
+            } catch (error) {
+                await interaction.update({ content: `${global.deps.config.settings.emojis.error} Failed to mute **${target.tag}**. I may not have permission to mute them.`, embeds: [], components: [] });
+            }
         } else if (interaction.customId === "cancel_mute") {
-            await interaction.update({ content: `${global.deps.config.settings.emojis.error} Mute cancelled.`, embeds: [], components: [] });
+            const cancelEmbed = new global.deps.discordjs.EmbedBuilder()
+                .setColor(global.deps.config.settings.colors.embeds.default)
+                .setDescription(`${global.deps.config.settings.emojis.error} Mute cancelled.`);
+
+            await interaction.update({ embeds: [cancelEmbed], components: [] });
         }
     });
 
-    collector.on("end", collected => {
-        if (collected.size === 0) {
-            msg.edit({ content: `${global.deps.config.settings.emojis.error} Mute request timed out.`, embeds: [], components: [] });
+    collector.on("end", async (_, reason) => {
+        if (reason === "time") {
+            await msg.edit({ components: [] }).catch(() => null);
         }
     });
-};
-
-exports.conf = {
-    name: "mute",
-    aliases: ["silence", "timeout"],
-    description: "Mutes a user for a specified duration.",
-    category: "moderation"
 };

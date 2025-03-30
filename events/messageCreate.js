@@ -6,6 +6,7 @@ client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
   if (!message.content.startsWith(config.prefix)) return;
   let command = message.content.toLocaleLowerCase().split(" ")[0].slice(config.prefix.length);
+  console.log(`Command detected: ${command}`);
   let params = message.content.split(" ").slice(1);
   let cmd;
   if (client.prefixCommands.has(command)) {
