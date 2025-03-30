@@ -1,0 +1,76 @@
+{
+    "bot-owners": ["1261791022623494195"],
+    "administrators": ["1261791022623494195"],
+
+    "emojis": {
+        "failed":"<a:wrong:1355855881933295660>",
+        "success": "<a:right:1355855905685635202>",
+        "info": "<a:info:1355844369281712259>",
+        "server": ":server:",
+        "user": ":user:",
+        "members": ":members:",
+        "warn": ":warn:",
+        "mute": ":mute:",
+        "mute_remove": ":mute_remove:",
+        "ban": ":ban:",
+        "unban": ":unban:",
+        "error": "<a:wrong:1355855881933295660>",
+        "notification": ":notification:",
+        "arrow_right": ":arrow_right:",
+        "arrow_left": ":arrow_left:",
+        "arrow_down": ":arrow_down:",
+        "arrow_up": ":arrow_up:",
+        "music": ":music:",
+        "volume": ":volume:",
+        "bullet_point": ":bullet_point:",
+        "subpoint": ":subpoint:",
+        "invite": ":invite:",
+        "giveaway": ":giveaway:",
+        "giveaway_reaction": ":giveaway_reaction:",
+        "tools": ":tools:"
+    },
+
+    "colors": {
+        "embeds": {
+            "default": "#000000",
+            "help": "#000000",
+            "ping": "#000000",
+            "userinfo": "#000000",
+            "serverinfo": "#000000",
+            "ban": "#000000",
+            "kick": "#000000",
+            "mute": "#000000",
+            "warn": "#000000",
+            "unban": "#000000"
+        },
+        "primary": "#000000",
+        "secondary": "#000000"
+    },
+
+    "commands": {
+        "help": {
+            "enabled": true
+        },
+        "ping": {
+            "enabled": true
+        },
+        "userinfo": {
+            "enabled": true
+        },
+        "serverinfo": {
+            "enabled": true
+        },
+        "ban": {
+            "enabled": true
+        },
+        "kick": {
+            "enabled": true
+        },
+        "mute": {
+            "enabled": true
+        },
+        "warn": {
+            "enabled": true
+        }
+    }
+}

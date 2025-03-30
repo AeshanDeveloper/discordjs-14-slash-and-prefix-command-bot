@@ -1,5 +1,6 @@
-const { Client, GatewayIntentBits, Partials } = require("discord.js");
-const config = require("./config.js");
+require("./modules/dependencies")
+const { Client, GatewayIntentBits, Partials } = global.deps.discordjs;
+const config = deps.config;
 
 const client = new Client({
   partials: [
@@ -33,7 +34,7 @@ const client = new Client({
 module.exports = client;
 
 //event handler
-const fs = require("fs");
+const fs = global.deps.fs;
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
 for (const file of eventFiles) {
   require("./events/"+file);
@@ -44,8 +45,8 @@ for (const file of eventFiles) {
 
 
 client.login(config.token).catch(e => {
-console.log(`──────────────────────────────────────────
-✕ | Invalid Discord Bot Token!
-──────────────────────────────────────────`)
-})
+  console.log(`──────────────────────────────────────────
+  ✕ | Invalid Discord Bot Token or something is wrong with the intents and partials!
+  ──────────────────────────────────────────`)
+  })
 

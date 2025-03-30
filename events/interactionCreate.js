@@ -1,4 +1,4 @@
-const { InteractionType } = require("discord.js");
+const { InteractionType } = global.deps.discordjs;
 const client = require("../index.js");
 client.on("interactionCreate", async (interaction) => {
 
@@ -15,7 +15,7 @@ if (interaction.type === InteractionType.ApplicationCommand) {
       console.log(error);
       await interaction.reply({
         content: "There was an error while executing this command!",
-        ephemeral: true,
+        flags: 64,
       });
     }
   }

@@ -1,54 +1,25 @@
-const { EmbedBuilder, Colors } = require("discord.js")
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
-const config = require("../../config.js")
-exports.run = function(client, message, args) {
-
-    let user = message.mentions.users.first() || message.guild.members.cache.get(args[0]) || message.author
-    
-    let response = fetch(`https://discord.com/api/v9/users/${user.id}`, {
-    method: 'GET',
-    headers: {
-    Authorization: `Bot ${config.token}`
-    }
-    })
-    let receive = ''
-    let banner = "https://dummyimage.com/2000x500/33363c/ffffff&text=No+Banner"
-    response.then(a => {
-    if (a.status !== 404) {
-    a.json().then(data => {
-    receive = data['banner']
-    
-    if (receive !== null) {
-    
-    let response2 = fetch(`https://cdn.discordapp.com/banners/${user.id}/${receive}.gif`, {
-    method: 'GET',
-    headers: {
-    Authorization: `Bot ${config.token}`
-    }
-    })
-    let statut = ''
-    response2.then(b => {
-    statut = b.status
-    banner = `https://cdn.discordapp.com/banners/${user.id}/${receive}.gif?size=1024`
-    if (statut === 415) {
-    banner = `https://cdn.discordapp.com/banners/${user.id}/${receive}.png?size=1024`
-    }})}})}})
-    
-    setTimeout(() => {
-    const embed = new EmbedBuilder()
-    .setDescription(`**[IMAGE](${banner})**`)
-    .setImage(banner)
-    .setColor(Colors.Blue)
-    .setTimestamp()
-    return message.reply({ embeds: [embed]}).catch(err => {})
-    }, 1000)
-
-};
-
 exports.conf = {
-  aliases: []
+  name: "banner",
+  description: "Get a user's profile banner.",
+  usage: "banner [@user]",
+  aliases: ["profilebanner"]
 };
 
-exports.help = {
-  name: 'banner'
+exports.run = async (client, message, args) => {
+  const user = message.mentions.users.first() || message.author;
+  const userData = await client.users.fetch(user.id, { force: true });
+
+  if (!userData.banner) {
+      return message.channel.send(`${global.deps.config.settings.emojis.error} This user has no profile banner!`);
+  }
+
+  const bannerURL = userData.bannerURL({ dynamic: true, size: 4096 });
+
+  const embed = new global.deps.discordjs.EmbedBuilder()
+      .setColor(global.deps.config.settings.colors.embeds.default)
+      .setTitle(`${user.tag}'s Banner`)
+      .setImage(bannerURL)
+      .setFooter({ text: `Requested by ${message.author.tag}`, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
+
+  message.channel.send({ embeds: [embed] });
 };
