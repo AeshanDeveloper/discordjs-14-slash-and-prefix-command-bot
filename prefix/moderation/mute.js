@@ -96,3 +96,10 @@ exports.run = async (client, message, args) => {
         }
     });
 };
+
+
+exports.conf = {
+    name: "mute", 
+    enabled: true,
+    cooldown: 5,
+};

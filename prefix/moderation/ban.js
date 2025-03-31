@@ -4,12 +4,6 @@ exports.description = "Ban a user from the server.";
 exports.usage = "<user> [reason]";
 exports.category = "moderation";
 
-exports.conf = {
-    enabled: true, // Enable or disable the command
-    cooldown: 5, // Cooldown in seconds
-    requiredPermissions: ["BanMembers"], // Permissions required to use the command
-};
-
 exports.run = async (client, message, args) => {
 
     // Check if the user has permission to ban members

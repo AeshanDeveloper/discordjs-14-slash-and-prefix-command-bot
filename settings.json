@@ -3,18 +3,18 @@
     "administrators": ["1261791022623494195"],
 
     "emojis": {
-        "failed":"<a:wrong:1355855881933295660>",
+        "failed": "<a:wrong:1355855881933295660>",
         "success": "<a:right:1355855905685635202>",
         "info": "<a:info:1355844369281712259>",
+        "ban": ":ban:",
+        "unban": ":unban:",
+        "mute": ":mute:",
+        "mute_remove": ":mute_remove:",
+        "error": "<a:wrong:1355855881933295660>",
         "server": ":server:",
         "user": ":user:",
         "members": ":members:",
         "warn": ":warn:",
-        "mute": ":mute:",
-        "mute_remove": ":mute_remove:",
-        "ban": ":ban:",
-        "unban": ":unban:",
-        "error": "<a:wrong:1355855881933295660>",
         "notification": ":notification:",
         "arrow_right": ":arrow_right:",
         "arrow_left": ":arrow_left:",
@@ -48,29 +48,57 @@
     },
 
     "commands": {
-        "help": {
-            "enabled": true
+        "moderation": {
+            "enabled": true,
+            "ban": {
+                "enabled": true,
+                "ownerOnly": false
+            },
+            "unban": {
+                "enabled": true,
+                "ownerOnly": false
+            },
+            "mute": {
+                "enabled": true,
+                "ownerOnly": false
+            },
+            "unmute": {
+                "enabled": true,
+                "ownerOnly": false
+            }
         },
-        "ping": {
-            "enabled": true
+        "utility": {
+            "enabled": true,
+            "ping" : {
+                "enabled": true,
+                "ownerOnly": false
+            }
         },
-        "userinfo": {
-            "enabled": true
+        "information": {
+            "enabled": true,
+            "help": {
+                "enabled": true,
+                "ownerOnly": false
+            },
+            "avatar": {
+                "enabled": true,
+                "ownerOnly": false
+            },
+            "banner": {
+                "enabled": true,
+                "ownerOnly": false
+            }
         },
-        "serverinfo": {
-            "enabled": true
-        },
-        "ban": {
-            "enabled": true
-        },
-        "kick": {
-            "enabled": true
-        },
-        "mute": {
-            "enabled": true
-        },
-        "warn": {
-            "enabled": true
+        "owner": {
+            "enabled": true,
+            "shutdown": {
+                "enabled": true,
+                "ownerOnly": true
+            },
+            "reload": {
+                "enabled": true,
+                "ownerOnly": true
+            }
         }
     }
 }

@@ -1,20 +1,30 @@
-var config = require("../config.js");
+const config = require("../config.js");
 const client = require("../index.js");
 
 client.on("messageCreate", async (message) => {
-  if (!message.guild) return;
-  if (message.author.bot) return;
-  if (!message.content.startsWith(config.prefix)) return;
-  let command = message.content.toLocaleLowerCase().split(" ")[0].slice(config.prefix.length);
-  console.log(`Command detected: ${command}`);
-  let params = message.content.split(" ").slice(1);
-  let cmd;
-  if (client.prefixCommands.has(command)) {
-    cmd = client.prefixCommands.get(command);
-  } else if (client.prefixAliases.has(command)) {
-    cmd = client.prefixCommands.get(client.prefixAliases.get(command));
-  }
-  if (cmd) {
-    cmd.run(client, message, params);
-  }
+    if (!message.guild || message.author.bot || !message.content.startsWith(config.prefix)) return;
+
+    let commandName = message.content.toLowerCase().split(" ")[0].slice(config.prefix.length);
+    let args = message.content.split(" ").slice(1);
+    let command = client.prefixCommands.get(commandName) || client.prefixCommands.get(client.prefixAliases.get(commandName));
+
+    if (!command) return;
+
+    let categorySettings = config.settings.commands[command.conf?.category];
+    let commandSettings = categorySettings?.[command.conf?.name];
+
+    if (!categorySettings?.enabled || !commandSettings?.enabled) return;
+
+    // Check for owner-only commands
+    if (commandSettings.ownerOnly && !config.settings["bot-owners"].includes(message.author.id)) {
+        return message.reply(`${config.settings.emojis.error} This command is only for bot owners!`);
+    }
+
+    // Execute the command
+    try {
+        await command.run(client, message, args);
+    } catch (error) {
+        console.error(`❌ Error in "${command.conf?.name}":`, error);
+        message.reply(`${config.settings.emojis.error} An error occurred while executing this command.`);
+    }
 });

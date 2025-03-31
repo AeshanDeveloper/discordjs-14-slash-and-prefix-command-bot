@@ -1,49 +1,59 @@
-exports.name = "ban"; // Ensure this exists
-exports.description = "Ban a user from the server.";
-exports.options = [
-    {
-        name: "user",
-        type: 6, // USER type
-        description: "The user to ban",
-        required: true
+const path = global.deps.path;
+
+module.exports = {
+    name:"ban",
+    conf: {
+        name: "ban",
+        category: path.basename(path.dirname(__filename))
     },
-    {
-        name: "reason",
-        type: 3, // STRING type
-        description: "Reason for the ban",
-        required: false
-    }
-];
 
-exports.run = async (client, interaction) => {
-    if (!interaction.member.permissions.has(global.deps.discordjs.PermissionsBitField.Flags.BanMembers)) {
-        return interaction.reply({ content: `${global.deps.config.settings.emojis.error} You don't have permission to ban members!`, flags: 64 });
-    }
+    data: new global.deps.discordjs.SlashCommandBuilder()
+        .setName("ban")
+        .setDescription("Ban a user from the server.")
+        .addUserOption(option =>
+            option.setName("user")
+                .setDescription("The user to ban")
+                .setRequired(true))
+        .addStringOption(option =>
+            option.setName("reason")
+                .setDescription("Reason for banning")
+                .setRequired(false)),
 
-    const target = interaction.options.getUser("user");
-    const reason = interaction.options.getString("reason") || "No reason provided";
-    const member = await interaction.guild.members.fetch(target.id).catch(() => null);
+    run: async (client, interaction) => {
+        try {
+            const { discordjs, config } = global.deps;
+            const { PermissionsBitField, EmbedBuilder } = discordjs;
+            const { success, error, ban } = config.settings.emojis;
+            const { default: embedColor } = config.settings.colors.embeds;
 
-    if (!member) {
-        return interaction.reply({ content: `${global.deps.config.settings.emojis.error} User is not in the server!`, flags: 64 });
-    }
+            const user = interaction.options.getUser("user");
+            const reason = interaction.options.getString("reason") || "No reason provided";
+            const member = await interaction.guild.members.fetch(user.id).catch(() => null);
 
-    await interaction.deferReply(); // Prevents "interaction already replied" errors
+            if (!member) return interaction.reply({ content: `${error} User is not in the server!`, flags: 64 });
 
-    try {
-        await member.ban({ reason });
+            if (!interaction.member.permissions.has(PermissionsBitField.Flags.BanMembers))
+                return interaction.reply({ content: `${error} You don't have permission to ban members!`, flags: 64 });
 
-        const embed = new global.deps.discordjs.EmbedBuilder()
-            .setColor(global.deps.config.settings.colors.embeds.default)
-            .setTitle(`${global.deps.config.settings.emojis.ban} User Banned`)
-            .setDescription(`**${target.tag}** has been banned.\n**Reason:** ${reason}`)
-            .setFooter({ text: `Banned by ${interaction.user.tag}`, iconURL: interaction.user.displayAvatarURL({ dynamic: true }) });
+            if (!interaction.guild.members.me.permissions.has(PermissionsBitField.Flags.BanMembers))
+                return interaction.reply({ content: `${error} I don't have permission to ban members!`, flags: 64 });
 
-        await interaction.editReply({ content: null, embeds: [embed] });
+            if (member.roles.highest.position >= interaction.guild.members.me.roles.highest.position)
+                return interaction.reply({ content: `${error} I cannot ban this user due to role hierarchy.`, flags: 64 });
 
-        // Send DM only if the ban was successful
-        await target.send(`${global.deps.config.settings.emojis.ban} You have been **banned** from **${interaction.guild.name}**!\n**Reason:** ${reason}`).catch(() => null);
-    } catch (error) {
-        await interaction.editReply({ content: `${global.deps.config.settings.emojis.error} Failed to ban **${target.tag}**. I may not have permission to ban them.` });
+            await member.ban({ reason });
+
+            const embed = new EmbedBuilder()
+                .setColor(embedColor)
+                .setDescription(`${success} Banned **${user.tag}**.\n**Reason:** ${reason}`);
+
+            await interaction.reply({ embeds: [embed] });
+
+            await user.send(`${ban} You have been **banned** from **${interaction.guild.name}**!\n**Reason:** ${reason}`).catch(() => null);
+
+        } catch (err) {
+            console.error(`❌ Error in ${module.exports.conf.name} command:`, err);
+            interaction.reply({ content: `${global.deps.config.settings.emojis.error} An error occurred while executing this command.`, flags: 64 });
+        }
     }
 };
