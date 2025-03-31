@@ -1,0 +1,82 @@
+{
+    "bot_owners": ["1261791022623494195"],
+    "administrators": ["1261791022623494195"],
+    
+    "emojis": {
+        "first": "⏪",
+        "previous": "◀",
+        "next": "▶",
+        "last": "⏩",
+        "failed": "<a:wrong:1355855881933295660>",
+        "success": "<a:right:1355855905685635202>",
+        "info": "<a:info:1355844369281712259>",
+        "ban": "🔨",
+        "unban": "🔓",
+        "mute": "🔇",
+        "mute_remove": "🔊",
+        "error": "<a:wrong:1355855881933295660>",
+        "server": "🌍",
+        "user": "👤",
+        "members": "👥",
+        "warn": "⚠️",
+        "notification": "🔔",
+        "arrow_right": "➡️",
+        "arrow_left": "⬅️",
+        "arrow_down": "⬇️",
+        "arrow_up": "⬆️",
+        "music": "🎵",
+        "volume": "🔊",
+        "bullet_point": "•",
+        "subpoint": "◦",
+        "invite": "🔗",
+        "giveaway": "🎉",
+        "giveaway_reaction": "🎁",
+        "tools": "🛠️",
+        "command":"<:slash_command:1356212927639715852>"
+    },
+
+    "colors": {
+        "embeds": {
+            "default": "#2f3136",
+            "help": "#2f3136",
+            "ping": "#2f3136",
+            "userinfo": "#2f3136",
+            "serverinfo": "#2f3136",
+            "ban": "#2f3136",
+            "kick": "#2f3136",
+            "mute": "#2f3136",
+            "warn": "#2f3136",
+            "unban": "#2f3136"
+        },
+        "primary": "#2f3136",
+        "secondary": "#2f3136"
+    },
+
+    "commands": {
+        "moderation": {
+            "enabled": true,
+            "ban": { "enabled": true, "ownerOnly": false },
+            "unban": { "enabled": true, "ownerOnly": false },
+            "mute": { "enabled": true, "ownerOnly": false },
+            "unmute": { "enabled": true, "ownerOnly": false },
+            "kick": { "enabled": true, "ownerOnly": false }
+        },
+        "utility": {
+            "enabled": true,
+            "ping": { "enabled": true, "ownerOnly": false }
+        },
+        "information": {
+            "enabled": true,
+            "help": { "enabled": true, "ownerOnly": false },
+            "avatar": { "enabled": true, "ownerOnly": false },
+            "banner": { "enabled": true, "ownerOnly": false }
+        },
+        "owners_only": {
+            "enabled": true,
+            "status": { "enabled": true, "ownerOnly": true },
+            "listservers": { "enabled": true, "ownerOnly": true },
+            "shutdown": { "enabled": true, "ownerOnly": true },
+            "reload": { "enabled": true, "ownerOnly": true }
+        }
+    }
+}

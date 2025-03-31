@@ -1,14 +1,7 @@
 {
-    "physical_owners": [
-        "1261791022623494195"
-    ],
-    "bot_owners": [
-        "1131339559016333465",
-        "1261791022623494195"
-    ],
-    "administrators": [
-        "1261791022623494195"
-    ],
+    "physical_owners": ["1261791022623494195"],
+    "bot_owners": [] ,
+    "administrators": [],
     "emojis": {
         "first": "⏪",
         "previous": "◀",
@@ -122,10 +115,6 @@
                 "ownerOnly": true
             },
             "removeadmin": {
-                "enabled": true,
-                "ownerOnly": true
-            },
-            "staff": {
                 "enabled": true,
                 "ownerOnly": true
             },
